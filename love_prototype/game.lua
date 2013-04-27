@@ -18,6 +18,12 @@ IMPORTS
 --]]------------------------------------------------------------
 
 local useful = require("useful")
+local Class = require("hump/class")
+
+--[[------------------------------------------------------------
+TARGETS
+--]]------------------------------------------------------------
+
 
 --[[------------------------------------------------------------
 GAME GAMESTATE
@@ -26,6 +32,7 @@ GAME GAMESTATE
 local state = GameState.new()
 
 function state:init()
+  self.heartrate = 0.3
 end
 
 function state:enter()
@@ -44,11 +51,28 @@ function state:keypressed(key, uni)
 end
 
 function state:update(dt)
+  
+  -- change heartrate
+  local delta = 0
+  if love.keyboard.isDown("up") then
+    delta = delta + 1
+  end
+
+  if love.keyboard.isDown("down") then
+    delta = delta - 1
+  end
+ 
+  self.heartrate = useful.clamp(self.heartrate + delta*dt*0.3, 0, 1)
+  
 end
 
 
 function state:draw()
-  love.graphics.print("Hello world!", 48, 48)
+  love.graphics.push()
+    love.graphics.setColor(255 * self.heartrate, 0, 255 * (1 - self.heartrate))
+    love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
+  love.graphics.pop()
+  
 end
 
 return state
