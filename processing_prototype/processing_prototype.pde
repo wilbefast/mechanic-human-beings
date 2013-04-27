@@ -34,9 +34,60 @@ class Player
   }
 }
 
+
+/*
+--------------------------------------------------------------------------------
+BUBBLE CLASS
+--------------------------------------------------------------------------------
+*/
+
+class Bubble
+{
+  static final float RADIUS = 32.0f, SPEED = 16.0f, DAMAGE_THRESHOLD = 0.2f;
+  
+  float x, y, wobble, heartrate;
+  boolean purge = false;
+  
+  Bubble(float heartrate)
+  {
+    this.x = random(1.0f)*(width - 2*RADIUS) + RADIUS;
+    this.y = -RADIUS;
+    this.heartrate = heartrate;
+  }
+  
+  void update(float dt)
+  {
+    // move
+    y += dt*SPEED;
+    
+    // destroy
+    float drate = abs(destroyer.heartrate - heartrate);
+    if(drate < DAMAGE_THRESHOLD)
+      wobble = 1 - drate/DAMAGE_THRESHOLD;
+  }
+  
+  void draw()
+  {
+    if(!purge)
+    {
+      color(255*heartrate, 0, 255*(1-heartrate)); 
+      ellipseMode(CENTER);
+      ellipse(x, y, RADIUS, RADIUS);
+    }
+  }
+}
+
+
+/*
+--------------------------------------------------------------------------------
+GLOBAL OBJECTS 
+--------------------------------------------------------------------------------
+*/
+
+
 Player creator, destroyer;
 
-
+ArrayList<Bubble> bubbles;
 
 /*
 --------------------------------------------------------------------------------
@@ -49,6 +100,8 @@ void setup()
   creator = new Player();
   destroyer = new Player();
   
+  bubbles = new ArrayList<Bubble>();
+  
   size(640, 480);
 }
 
@@ -60,10 +113,23 @@ UPDATE
 --------------------------------------------------------------------------------
 */
 
+float creation_timer = 0;
+float CREATION_INTERVAL = 15;
 void __update(float dt) 
 {
-  creator.heartrate = destroyer.heartrate = clamp(destroyer.heartrate + signedRand(dt), 0, 1);
-  println(destroyer.heartrate);
+  creator.heartrate = clamp(destroyer.heartrate + signedRand(dt), 0, 1);
+  
+  // create bubbles
+  creation_timer = creation_timer - dt;
+  if(creation_timer < 0)
+  {
+    creation_timer = CREATION_INTERVAL;
+    bubbles.add(new Bubble(creator.heartrate));
+  }
+  
+  // update bubbles
+  for(Bubble b : bubbles)
+    b.update(dt);
 }
 
 
@@ -76,7 +142,12 @@ GRAPHICS
 
 void __draw() 
 {
+  // draw the background based on destroy heartrate
   background(255*creator.heartrate, 0, 255*(1-creator.heartrate)); 
+  
+  // draw bubbles
+  for(Bubble b : bubbles)
+    b.draw();
 }
 
 
