@@ -70,9 +70,12 @@ class Bubble
   {
     if(!purge)
     {
-      color(255*heartrate, 0, 255*(1-heartrate)); 
+      float wobble_radius = RADIUS * (1 + 0.3f*signedRand(wobble));
+      
+      
+      fill(255*heartrate, 0, 255*(1-heartrate)); 
       ellipseMode(CENTER);
-      ellipse(x, y, RADIUS, RADIUS);
+      ellipse(x, y, wobble_radius, wobble_radius);
     }
   }
 }
@@ -117,7 +120,13 @@ float creation_timer = 0;
 float CREATION_INTERVAL = 15;
 void __update(float dt) 
 {
+  // random creator heartrate
   creator.heartrate = clamp(destroyer.heartrate + signedRand(dt), 0, 1);
+  
+  // controlled destroyer heartrate
+  int delta = 0;
+  if(keyUp) delta++; if(keyDown) delta--;
+  destroyer.heartrate = clamp(destroyer.heartrate + delta*dt*0.3f, 0, 1);
   
   // create bubbles
   creation_timer = creation_timer - dt;
@@ -143,7 +152,7 @@ GRAPHICS
 void __draw() 
 {
   // draw the background based on destroy heartrate
-  background(255*creator.heartrate, 0, 255*(1-creator.heartrate)); 
+  background(255*destroyer.heartrate, 0, 255*(1-destroyer.heartrate)); 
   
   // draw bubbles
   for(Bubble b : bubbles)
