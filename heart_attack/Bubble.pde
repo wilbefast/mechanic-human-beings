@@ -3,23 +3,25 @@
 BUBBLE CLASS
 --------------------------------------------------------------------------------
 */
-
+float BubbleSpeed = 0.0f;
 class Bubble
 {
-  static final float RADIUS = 32.0f, 
-                    SPEED = 16.0f, 
+  static final float RADIUS = 32.0f,
                     DAMAGE_THRESHOLD = 0.1f, 
                     DAMAGE_SPEED = 0.02f,
                     RADIUS_CHANGE_SPEED = 0.1f,
                     WOBBLE_AMOUNT = 0.5f,
                     LINE_WIDTH = 5.0f,
                     CREATION_INTERVAL = 2.0f;
-  
+                    
   float x, y, wobble, radius, heartrate, hitpoints;
   boolean purge = false;
   
   Bubble(float y, float heartrate)
   {
+    BubbleSpeed = width/640.0f * 16.0f;
+    
+    
     this.x = RADIUS;
     
     this.y = y;
@@ -31,7 +33,7 @@ class Bubble
   void update(float dt)
   {
     // move
-    x += dt*SPEED;
+    x += dt*BubbleSpeed;
     
     // wobble
     float delta = abs(destroyer.y - y);

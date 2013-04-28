@@ -29,9 +29,9 @@ PFont font;
 void setup() 
 {
   // screen resolution
-  //size(640, 480);
+  size(640, 480);
   frame.setTitle("Heart Attack!");
-  size(displayWidth, displayHeight);  // Stage size
+  //size(displayWidth, displayHeight);  // Stage size
   frameRate(MAX_FPS);  
   
   font = loadFont("Arial-BoldMT-24.vlw");
@@ -163,21 +163,13 @@ void __draw()
     
   // draw GUI text
   fill(0, 0, 0); 
-    text((int)(creator.heartrate*100) + "%",  32, height - 16);
-    text((int)(destroyer.heartrate*100) + "%", width - 32, height - 16);
-   
-  text(creator.score,  32, 48);
-  text(destroyer.score, width - 32, 48);
+  text(creator.score,  32, height - 16);
+  text(destroyer.score, width - 32, height - 16);
   
   fill(keyA ? 255 : 0, 0, keyA ? 0 : 255);
   text("A",  32, 24);
   fill(keyM ? 255 : 0, 0, keyM ? 0 : 255);
   text("M", width - 32, 24);
-  
-  
-  fill(0, 0, 0); 
-  textAlign(CENTER);
-  text("Heart Attack!", width/2, 32);
 }
 
 
