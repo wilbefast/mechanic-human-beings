@@ -1,44 +1,141 @@
 /*
-THIS PROGRAM WORKS WITH PulseSensorAmped_Arduino-xx ARDUINO CODE
-THE PULSE DATA WINDOW IS SCALEABLE WITH SCROLLBAR AT BOTTOM OF SCREEN
-PRESS 'S' OR 's' KEY TO SAVE A PICTURE OF THE SCREEN IN SKETCH FOLDER (.jpg)
-MADE BY JOEL MURPHY AUGUST, 2012
+--------------------------------------------------------------------------------
+IMPORTS
+--------------------------------------------------------------------------------
+*/
+
+import java.util.Iterator;
+
+/*
+--------------------------------------------------------------------------------
+USEFUL FUNCTIONS
+--------------------------------------------------------------------------------
 */
 
 
-import processing.serial.*;
-PFont font;
-Scrollbar scaleBar;
+float clamp(float value, float min, float max)
+{
+  return(value > max ? max : (value < min ? min : value));
+}
 
-Serial port;     
+float signedRand(float value)
+{
+  float r = random(1.0f);
+  return value*2*(r < 0.5 ? r : -r + 0.5);
+}
 
-int Sensor;      // HOLDS PULSE SENSOR DATA FROM ARDUINO
-int IBI;         // HOLDS TIME BETWEN HEARTBEATS FROM ARDUINO
-int BPM;         // HOLDS HEART RATE VALUE FROM ARDUINO
-int[] RawY;      // HOLDS HEARTBEAT WAVEFORM DATA BEFORE SCALING
-int[] ScaledY;   // USED TO POSITION SCALED HEARTBEAT WAVEFORM
-int[] rate;      // USED TO POSITION BPM DATA WAVEFORM
+float linter(float a, float b, float weight)
+{
+  return (a*weight + b*(1-weight));
+}
 
-int Sensor2;      // HOLDS PULSE SENSOR DATA FROM ARDUINO
-int IBI2;         // HOLDS TIME BETWEN HEARTBEATS FROM ARDUINO
-int BPM2;         // HOLDS HEART RATE VALUE FROM ARDUINO
-int[] RawY2;      // HOLDS HEARTBEAT WAVEFORM DATA BEFORE SCALINGnjhvegtnnnnn
 
-float zoom;      // USED WHEN SCALING PULSE WAVEFORM TO PULSE WINDOW
-float offset;    // USED WHEN SCALING PULSE WAVEFORM TO PULSE WINDOW
-color eggshell = color(255, 253, 248);
-int heart = 0;   // This variable times the heart image 'pulse' on screen
-int heart2 = 0;   // This variable times the heart image 'pulse' on screen
-//  THESE VARIABLES DETERMINE THE SIZE OF THE DATA WINDOWS
-int PulseWindowWidth = 490;
-int PulseWindowHeight = 512; 
-int BPMWindowWidth = 180;
-int BPMWindowHeight = 340;
-boolean beat = false;    // set when a heart beat is detected, then cleared when the BPM graph is advanced
-boolean beat2 = false;    // set when a heart beat is detected, then cleared when the BPM graph is advanced
-int oldBPM;
+/*
+--------------------------------------------------------------------------------
+PLAYER CLASS
+--------------------------------------------------------------------------------
+*/
 
-void setup() {
+
+class Player
+{
+  float heartrate;
+  
+  Player()
+  {
+    heartrate = 0.5;
+  }
+}
+
+
+/*
+--------------------------------------------------------------------------------
+BUBBLE CLASS
+--------------------------------------------------------------------------------
+*/
+
+class Bubble
+{
+  static final float RADIUS = 128.0f, 
+                    SPEED = 32.0f, 
+                    DAMAGE_THRESHOLD = 0.06f, 
+                    DAMAGE_SPEED = 0.05f,
+                    RADIUS_CHANGE_SPEED = 0.1f,
+                    WOBBLE_AMOUNT = 0.5f,
+                    LINE_WIDTH = 8.0f;
+  
+  float x, y, wobble, radius, heartrate, hitpoints;
+  boolean purge = false;
+  
+  Bubble(float heartrate)
+  {
+    this.x = random(1.0f)*(width - 2*RADIUS) + RADIUS;
+    this.y = -RADIUS/2;
+    this.radius = RADIUS;
+    this.heartrate = heartrate;
+    this.hitpoints = 1.0f;
+  }
+  
+  void update(float dt)
+  {
+    // move
+    y += dt*SPEED;
+    
+    // wobble
+    float drate = abs(destroyer.heartrate - heartrate);
+    if(drate < DAMAGE_THRESHOLD)
+      wobble = 1 - drate/DAMAGE_THRESHOLD;
+    else
+      wobble = 0.0f;
+      
+    // take damage
+    if(y > 0)
+    {
+      hitpoints -= wobble * DAMAGE_SPEED;
+      if(hitpoints <= 0)
+        purge = true;
+    }
+    
+    // disppear off map
+    if(y - RADIUS > height)
+      purge = true;
+  }
+  
+  void draw()
+  {
+    if(!purge)
+    {
+      float target_radius = RADIUS * (1 + WOBBLE_AMOUNT*signedRand(wobble));
+      radius = linter(target_radius, radius, RADIUS_CHANGE_SPEED);
+      
+      strokeWeight(LINE_WIDTH * hitpoints);
+      fill(255*heartrate, 0, 255*(1-heartrate)); 
+      ellipseMode(CENTER);
+      ellipse(x, y, radius, radius);
+    }
+  }
+}
+
+
+/*
+--------------------------------------------------------------------------------
+GLOBAL OBJECTS 
+--------------------------------------------------------------------------------
+*/
+
+
+Player creator, destroyer;
+
+ArrayList<Bubble> bubbles;
+
+/*
+--------------------------------------------------------------------------------
+INIT 
+--------------------------------------------------------------------------------
+*/
+
+void setup() 
+{
   size(700, 600);  // Stage size
   frameRate(100);  
   font = loadFont("Arial-BoldMT-24.vlw");
@@ -67,54 +164,128 @@ void setup() {
   port = new Serial(this, Serial.list()[6], 115200);  // make sure Arduino is talking serial at this baud rate
   port.clear();            // flush buffer
   port.bufferUntil('\n');  // set buffer full flag on receipt of carriage return
+  
+  
+  creator = new Player();
+  destroyer = new Player();
+  
+  bubbles = new ArrayList<Bubble>();
+  
+  //size(displayWidth, displayHeight);
+  size(960, 640);
 }
-  
-void draw() {
-  background(0);
-  noStroke();
-// DRAW OUT THE PULSE WINDOW AND BPM WINDOW RECTANGLES  
-  fill(eggshell);  // color for the window background
- // rect(255,height/2,PulseWindowWidth,PulseWindowHeight);
- // rect(600,385,BPMWindowWidth,BPMWindowHeight);
-  
-// DRAW THE PULSE WAVEFORM
-  // prepare pulse data points    
-  RawY[RawY.length-1] = (1023 - Sensor) - 212;   // place the new raw datapoint at the end of the array
-  zoom = scaleBar.getPos();                      // get current waveform scale value
-  offset = map(zoom,0.5,1,150,0);                // calculate the offset needed at this scale
-  for (int i = 0; i < RawY.length-1; i++) {      // move the pulse waveform by
-    RawY[i] = RawY[i+1];                         // shifting all raw datapoints one pixel left
-    float dummy = RawY[i] * zoom + offset;       // adjust the raw data to the selected scale
-    ScaledY[i] = constrain(int(dummy),44,556);   // transfer the raw data array to the scaled array
-  }
- 
- 
-// DRAW THE HEART AND MAYBE MAKE IT BEAT
-  fill(250,0,0);
-  stroke(250,0,0);
-  // the 'heart' variable is set in serialEvent when arduino sees a beat happen
-  heart--;                    // heart is used to time how long the heart graphic swells when your heart beats
-  heart = max(heart,0);       // don't let the heart variable go into negative numbers
-  if (heart > 0){             // if a beat happened recently, 
-    strokeWeight(8);          // make the heart big
-  }
-  smooth();   // draw the heart with two bezier curves
-  bezier(width-100,50, width-20,-20, width,140, width-100,150);
-  bezier(width-100,50, width-190,-20, width-200,140, width-100,150);
-  strokeWeight(1);          // reset the strokeWeight for next time 
-  
-  //fill(random(250), random(250), random(250));
-  ellipse(100,100,BPM/2,BPM/2);
-  ellipse(100,300,BPM2/2,BPM2/2);
-  
-  text(BPM + " BPM",600,200);
-  text(BPM2 + " BPM2",600,300);
-  
-  //text(BPM + " BPM",200+random(100),200+random(100));
-  //text(BPM2 + " BPM2",600,300);
-}  //end of draw loop
 
-void stop() {
+
+
+/*
+--------------------------------------------------------------------------------
+UPDATE
+--------------------------------------------------------------------------------
+*/
+
+float creation_timer = 0;
+float CREATION_INTERVAL = 2;
+void __update(float dt) 
+{
+  creator.heartrate = clamp((BPM-50.0f)/100.0f,0,1);
+  destroyer.heartrate = clamp((BPM2-50.0f)/100.0f,0,1);
+  // random creator heartrate
+  /*creator.heartrate = clamp(creator.heartrate + signedRand(dt), 0, 1);
+  
+  // controlled destroyer heartrate
+  int delta = 0;
+  if(keyUp) delta++; if(keyDown) delta--;
+  destroyer.heartrate = clamp(destroyer.heartrate + delta*dt*0.3f, 0, 1);*/
+  
+  // create bubbles
+  creation_timer = creation_timer - dt;
+  if(creation_timer < 0)
+  {
+    creation_timer = CREATION_INTERVAL;
+    bubbles.add(new Bubble(creator.heartrate));
+  }
+  
+  // update bubbles
+  Iterator<Bubble> biter = bubbles.iterator();
+  while(biter.hasNext())
+  {
+    Bubble b = biter.next();
+    if(b.purge)
+      biter.remove();
+    else
+      b.update(dt);
+  }
+}
+
+
+
+/*
+--------------------------------------------------------------------------------
+GRAPHICS
+--------------------------------------------------------------------------------
+*/
+
+void __draw() 
+{
+  // draw the background based on destroy heartrate
+  background(255*destroyer.heartrate, 0, 255*(1-destroyer.heartrate)); 
+  
+  // draw bubbles
+  for(Bubble b : bubbles)
+    b.draw();
+    
+  color(0);
+  fill(0,0,0);  
+  text(BPM + " BPM, creator:" + creator.heartrate ,600,200);
+  text(BPM2 + " BPM2, destroyer:" + destroyer.heartrate ,600,300);
+}
+
+
+
+/*
+--------------------------------------------------------------------------------
+MAIN LOOP
+--------------------------------------------------------------------------------
+*/
+
+float DT = 1.0/60.0;
+void draw() 
+{ 
+  __update(DT);
+  __draw();
+}
+
+
+/*
+--------------------------------------------------------------------------------
+INPUT HANDLING
+--------------------------------------------------------------------------------
+*/
+
+boolean keyUp = false, keyDown = false;
+
+void setKeyState(int _key, int _keyCode, boolean newState)
+{
+  if(_key == CODED)
+  {
+    if(_keyCode == UP)
+      keyUp = newState;
+    else if (_keyCode == DOWN)
+      keyDown = newState;
+  }
+}
+
+void stop()
+{
   port.stop();
 }
 
+void keyPressed()
+{
+  setKeyState(key, keyCode, true);
+}
+
+void keyReleased()
+{
+  setKeyState(key, keyCode, false);
+}
