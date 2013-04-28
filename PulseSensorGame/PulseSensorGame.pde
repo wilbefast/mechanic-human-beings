@@ -207,8 +207,8 @@ void __draw()
   fill(0, 0, 0); 
   if(use_pulsesensor)
   {
-    text(BPM + " BPM (" + (int)(creator.heartrate*100) + "%)", 64, height - 16);
-    text(BPM2 + " BPM = (" + (int)(destroyer.heartrate*100) + "%)", width - 64, height - 16);
+    text(BPM + " BPM", 64, height - 16);
+    text(BPM2 + " BPM", width - 64, height - 16);
   }
   else
   { 
