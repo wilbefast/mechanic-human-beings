@@ -134,10 +134,16 @@ INIT
 --------------------------------------------------------------------------------
 */
 
+int MAX_FPS = 120;
+boolean use_pulsesensor = true;
+
 void setup() 
 {
-  size(700, 600);  // Stage size
-  frameRate(100);  
+  // screen resolution
+  size(displayWidth, displayHeight);  // Stage size
+  frameRate(MAX_FPS);  
+  
+  
   font = loadFont("Arial-BoldMT-24.vlw");
   textFont(font);
   textAlign(CENTER);
@@ -158,21 +164,30 @@ void setup()
     RawY[i] = height/2; // initialize the pulse window data line to V/2
  }
    
-// GO FIND THE ARDUINO
-  println(Serial.list());    // print a list of available serial ports
-  // choose the number between the [] that is connected to the Arduino
-  port = new Serial(this, Serial.list()[6], 115200);  // make sure Arduino is talking serial at this baud rate
-  port.clear();            // flush buffer
-  port.bufferUntil('\n');  // set buffer full flag on receipt of carriage return
-  
+  if(use_pulsesensor) 
+  {
+    try
+    {
+      // GO FIND THE ARDUINO
+      println(Serial.list());    // print a list of available serial ports
+      
+      // choose the number between the [] that is connected to the Arduino
+      port = new Serial(this, Serial.list()[6], 115200);  // make sure Arduino is talking serial at this baud rate
+      port.clear();            // flush buffer
+      port.bufferUntil('\n');  // set buffer full flag on receipt of carriage return
+      
+      use_pulsesensor = true;
+    }
+    catch(Exception e)
+    {
+      use_pulsesensor = false;
+    }
+  }
   
   creator = new Player();
   destroyer = new Player();
   
   bubbles = new ArrayList<Bubble>();
-  
-  //size(displayWidth, displayHeight);
-  size(960, 640);
 }
 
 
@@ -187,15 +202,22 @@ float creation_timer = 0;
 float CREATION_INTERVAL = 2;
 void __update(float dt) 
 {
-  creator.heartrate = clamp((BPM-50.0f)/100.0f,0,1);
-  destroyer.heartrate = clamp((BPM2-50.0f)/100.0f,0,1);
-  // random creator heartrate
-  /*creator.heartrate = clamp(creator.heartrate + signedRand(dt), 0, 1);
-  
-  // controlled destroyer heartrate
-  int delta = 0;
-  if(keyUp) delta++; if(keyDown) delta--;
-  destroyer.heartrate = clamp(destroyer.heartrate + delta*dt*0.3f, 0, 1);*/
+  /// SET HEARTRATES BASED ON PULSENSOR OR KEYBOARD
+  if(use_pulsesensor)
+  {
+    creator.heartrate = clamp((BPM-50.0f)/100.0f,0,1);
+    destroyer.heartrate = clamp((BPM2-50.0f)/100.0f,0,1);
+  }
+  else
+  {
+    // random creator heartrate
+    creator.heartrate = clamp(creator.heartrate + signedRand(dt), 0, 1);
+    
+    // controlled destroyer heartrate
+    int delta = 0;
+    if(keyUp) delta++; if(keyDown) delta--;
+    destroyer.heartrate = clamp(destroyer.heartrate + delta*dt*0.3f, 0, 1);
+  }
   
   // create bubbles
   creation_timer = creation_timer - dt;
@@ -248,7 +270,7 @@ MAIN LOOP
 --------------------------------------------------------------------------------
 */
 
-float DT = 1.0/60.0;
+float DT = 1.0f/MAX_FPS;
 void draw() 
 { 
   __update(DT);
