@@ -203,6 +203,8 @@ UPDATE
 
 float creation_timer = 0;
 float CREATION_INTERVAL = 2;
+int bubblecount=0;
+int popcount=0;
 void __update(float dt) 
 {
   /// SET HEARTRATES BASED ON PULSENSOR OR KEYBOARD
@@ -228,6 +230,7 @@ void __update(float dt)
   {
     creation_timer = CREATION_INTERVAL;
     bubbles.add(new Bubble(creator.heartrate));
+    bubblecount++;
   }
   
   // update bubbles
@@ -236,9 +239,14 @@ void __update(float dt)
   {
     Bubble b = biter.next();
     if(b.purge)
+		{
       biter.remove();
+			popcount++;
+		}
     else
+    {
       b.update(dt);
+    }
   }
 }
 
@@ -259,7 +267,6 @@ void __draw()
   for(Bubble b : bubbles)
     b.draw();
     
-  color(0);
   fill(0,0,0); 
   
   if(use_pulsesensor)
