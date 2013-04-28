@@ -6,13 +6,14 @@ BUBBLE CLASS
 
 class Bubble
 {
-  static final float RADIUS = 96.0f, 
-                    SPEED = 38.0f, 
-                    DAMAGE_THRESHOLD = 0.12f, 
+  static final float RADIUS = 64.0f, 
+                    SPEED = 16.0f, 
+                    DAMAGE_THRESHOLD = 0.2f, 
                     DAMAGE_SPEED = 0.05f,
                     RADIUS_CHANGE_SPEED = 0.1f,
                     WOBBLE_AMOUNT = 0.5f,
-                    LINE_WIDTH = 8.0f;
+                    LINE_WIDTH = 8.0f,
+                    CREATION_INTERVAL = 4.5f;
   
   float x, y, wobble, radius, heartrate, hitpoints;
   boolean purge = false;

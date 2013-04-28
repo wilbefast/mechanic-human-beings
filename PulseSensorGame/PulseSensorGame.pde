@@ -91,7 +91,6 @@ UPDATE
 */
 
 float creation_timer = 0;
-float CREATION_INTERVAL = 2;
 void __update(float dt) 
 {
   /// SET HEARTRATES BASED ON PULSENSOR OR KEYBOARD
@@ -120,7 +119,7 @@ void __update(float dt)
   creation_timer = creation_timer - dt;
   if(creation_timer < 0)
   {
-    creation_timer = CREATION_INTERVAL;
+    creation_timer = Bubble.CREATION_INTERVAL;
     bubbles.add(new Bubble(creator.heartrate));
   }
   
@@ -146,16 +145,22 @@ GRAPHICS
 
 void __draw() 
 {
-  // draw the background based on destroy heartrate
-  background(255*destroyer.heartrate, 0, 255*(1-destroyer.heartrate)); 
+  // draw the background based on destroyer heartrate
+  background(255);
+  //background(255*destroyer.heartrate, 0, 255*(1-destroyer.heartrate)); 
+  
+  // draw destroyer bar
+  strokeWeight(5.0f);
+  fill(255*destroyer.heartrate, 0, 255*(1-destroyer.heartrate));
+  float bar_y = (1-destroyer.heartrate)*height, bar_h = 2*Bubble.RADIUS*Bubble.DAMAGE_THRESHOLD;
+  rectMode(CORNER);
+  rect(0, bar_y - 16, width, 32); 
   
   // draw bubbles
   for(Bubble b : bubbles)
     b.draw();
     
-  color(0);
-  fill(0,0,0); 
-  
+  fill(0, 0, 0); 
   if(use_pulsesensor)
   {
     text("CREATOR: " + BPM + " BPM (" + (int)(creator.heartrate*100) + "%)", 128, height - 32);
