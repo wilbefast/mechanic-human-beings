@@ -76,9 +76,9 @@ class Bubble
       strokeWeight(LINE_WIDTH * hitpoints);
       fill(255*heartrate, 0, 255*(1-heartrate)); 
       if(x > RADIUS * 2) 
-        draw_heart(x, y, radius/RADIUS*2, heartrate);
+        draw_heart(x, y, radius/RADIUS, heartrate);
       else
-        draw_heart(x, y, radius/RADIUS*(x/RADIUS), heartrate);
+        draw_heart(x, y, radius/RADIUS/x*RADIUS/2, heartrate);
     }
   }
 }

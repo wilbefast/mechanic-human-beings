@@ -166,6 +166,9 @@ void __draw()
   fill(255*destroyer.heartrate, 0, 255*(1-destroyer.heartrate));
   float bar_y = destroyer.y, bar_h = Bubble.RADIUS*Bubble.DAMAGE_THRESHOLD;
   rectMode(CORNER);
+  
+  // explosion
+  float r = 24+signedRand(4);
   if(destroyer.target == null)
     rect(0, bar_y - 16, width, 16);
   else
@@ -173,15 +176,21 @@ void __draw()
     rect(destroyer.target.x, bar_y - 16, width - destroyer.target.x, 16); 
     // draw explosions
     ellipseMode(RADIUS);
-    float r = 32+signedRand(8);
-    ellipse(destroyer.target.x, bar_y, r, r); 
+    fill(255*destroyer.heartrate, 0, 255*(1-destroyer.heartrate));
+    ellipse(destroyer.target.x+signedRand(4), bar_y+signedRand(4), r, r); 
   }
     
-
-  
   // draw bubbles
   for(Bubble b : bubbles)
     b.draw();
+    
+  if(destroyer.target != null)
+  {
+    stroke(255*destroyer.heartrate*2, 128, 255*(1-destroyer.heartrate));
+    strokeWeight(5.0f);
+    fill(255*destroyer.heartrate, 0, 255*(1-destroyer.heartrate), 128);
+    ellipse(destroyer.target.x+signedRand(4), bar_y+signedRand(4), r, r); 
+  }
   
   // draw GUI boxes
   fill(255);
