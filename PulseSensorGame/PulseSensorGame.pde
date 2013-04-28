@@ -167,9 +167,17 @@ void __draw()
   float bar_y = destroyer.y, bar_h = Bubble.RADIUS*Bubble.DAMAGE_THRESHOLD;
   rectMode(CORNER);
   if(destroyer.target == null)
-    rect(0, bar_y - 16, width, 16); 
+    rect(0, bar_y - 16, width, 16);
   else
+  {
     rect(destroyer.target.x, bar_y - 16, width - destroyer.target.x, 16); 
+    // draw explosions
+    ellipseMode(RADIUS);
+    float r = 32+signedRand(8);
+    ellipse(destroyer.target.x, bar_y, r, r); 
+  }
+    
+
   
   // draw bubbles
   for(Bubble b : bubbles)
