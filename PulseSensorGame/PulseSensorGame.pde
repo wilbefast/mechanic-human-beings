@@ -109,9 +109,12 @@ void draw() {
   
   text(BPM + " BPM",600,200);
   text(BPM2 + " BPM2",600,300);
+  
+  //text(BPM + " BPM",200+random(100),200+random(100));
+  //text(BPM2 + " BPM2",600,300);
 }  //end of draw loop
 
-void exit() {
+void stop() {
   port.stop();
 }
 

@@ -10,7 +10,6 @@ volatile int thresh = 512;                // used to find instant moment of hear
 volatile int amp = 100;                   // used to hold amplitude of pulse waveform
 volatile boolean firstBeat = true;        // used to seed rate array so we startup with reasonable BPM
 volatile boolean secondBeat = true;       // used to seed rate array so we startup with reasonable BPM
-volatile int ampt = 50;
 
 volatile int rate2[10];                    // used to hold last ten IBI values
 volatile unsigned long sampleCounter2 = 0;          // used to determine pulse timing
@@ -82,15 +81,8 @@ if (N > 250){                                   // avoid high frequency noise
         
     rate[9] = IBI;                          // add the latest IBI to the rate array
     runningTotal += rate[9];                // add the latest IBI to runningTotal
-    runningTotal /= 10;                     // average the last 10 IBI values
-    if(P - T > ampt)
-    { 
-      BPM = 60000/runningTotal;               // how many beats can fit into a minute? that's BPM!
-    }
-      else
-    {
-      BPM = 0;
-    }
+    runningTotal /= 10;                     // average the last 10 IBI values 
+    BPM = 60000/runningTotal;               // how many beats can fit into a minute? that's BPM!
     QS = true;                              // set Quantified Self flag 
     // QS FLAG IS NOT CLEARED INSIDE THIS ISR
     }                       
@@ -114,8 +106,7 @@ if (N > 250){                                   // avoid high frequency noise
       secondBeat = true;                     // when we get the heartbeat back
      }
   
-  sei();                                     // enable interrupts when youre done!
-                        
+  sei();                                     // enable interrupts when youre done!                        
                         
     // triggered when Timer2 counts to 124
     cli();                                      // disable interrupts while we do this
@@ -165,14 +156,7 @@ if (N2 > 250){                                   // avoid high frequency noise
     rate2[9] = IBI;                          // add the latest IBI to the rate array
     runningTotal2 += rate2[9];                // add the latest IBI to runningTotal
     runningTotal2 /= 10;                     // average the last 10 IBI values 
-    if(P2 - T2 > ampt)
-    { 
-      BPM2 = 60000/runningTotal2;               // how many beats can fit into a minute? that's BPM!
-    }
-      else
-    {
-      BPM2 = 0;
-    }
+    BPM2 = 60000/runningTotal2;               // how many beats can fit into a minute? that's BPM!
     QS2 = true;                              // set Quantified Self flag 
     // QS FLAG IS NOT CLEARED INSIDE THIS ISR
     }                       
