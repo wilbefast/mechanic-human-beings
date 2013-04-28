@@ -119,15 +119,15 @@ void __update(float dt)
   }
   
   // move players
-  destroyer.y = (1-destroyer.heartrate)*(height - 2*Bubble.RADIUS) + Bubble.RADIUS;
-  creator.y = (1-creator.heartrate)*(height - 2*Bubble.RADIUS) + Bubble.RADIUS;
+  destroyer.y = (1-destroyer.heartrate)*(height - 128) + 64;
+  creator.y = (1-creator.heartrate)*(height - 128) + 64;
   
   // create bubbles
   creation_timer = creation_timer - dt;
   if(creation_timer < 0)
   {
     creation_timer = Bubble.CREATION_INTERVAL;
-    bubbles.add(new Bubble(creator.heartrate));
+    bubbles.add(new Bubble(creator.y, creator.heartrate));
   }
   
   // update bubbles
@@ -161,7 +161,7 @@ void __draw()
   //background(255*destroyer.heartrate, 0, 255*(1-destroyer.heartrate)); 
   
   // draw destroyer bar
-  stroke(0);
+  stroke(255*destroyer.heartrate*2, 128, 255*(1-destroyer.heartrate));
   strokeWeight(5.0f);
   fill(255*destroyer.heartrate, 0, 255*(1-destroyer.heartrate));
   float bar_y = destroyer.y, bar_h = Bubble.RADIUS*Bubble.DAMAGE_THRESHOLD;
