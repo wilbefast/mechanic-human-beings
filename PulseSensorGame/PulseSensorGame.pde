@@ -180,6 +180,8 @@ void setup()
     }
     catch(Exception e)
     {
+      println("Arduin Pulsesensor startup failed (" + e + ").");
+      println("Defaulting to keyboard control.");
       use_pulsesensor = false;
     }
   }
