@@ -8,7 +8,7 @@ class Bubble
 {
   static final float RADIUS = 64.0f, 
                     SPEED = 16.0f, 
-                    DAMAGE_THRESHOLD = 0.2f, 
+                    DAMAGE_THRESHOLD = 0.1f, 
                     DAMAGE_SPEED = 0.05f,
                     RADIUS_CHANGE_SPEED = 0.1f,
                     WOBBLE_AMOUNT = 0.5f,
@@ -34,28 +34,35 @@ class Bubble
     x += dt*SPEED;
     
     // wobble
-    float drate = abs(destroyer.heartrate - heartrate);
-    if(drate < DAMAGE_THRESHOLD)
-      wobble = 1 - drate/DAMAGE_THRESHOLD;
+    float delta = abs(destroyer.y - y);
+    if(x > RADIUS && delta < RADIUS)
+    {
+      if(destroyer.target == null || destroyer.target.x < x)
+      {
+        if(destroyer.target != null)
+          destroyer.target.wobble = 0;
+        destroyer.target = this;
+        wobble = 1 - delta/RADIUS;
+      }
+    }
     else
       wobble = 0.0f;
       
-    // take damage
-    if(x > RADIUS)
-    {
-      hitpoints -= wobble * DAMAGE_SPEED;
-      if(hitpoints <= 0)
-      {
-        purge = true;
-        destroyer.score += 1;
-      }
-    }
-    
     // disppear off map
     if(x - RADIUS > width)
     {
       purge = true;
       creator.score += 5;
+    }
+  }
+  
+  void takeDamage()
+  {
+    hitpoints -= wobble * DAMAGE_SPEED;
+    if(hitpoints <= 0)
+    {
+      purge = true;
+      destroyer.score += 1;
     }
   }
   
@@ -68,7 +75,7 @@ class Bubble
       
       strokeWeight(LINE_WIDTH * hitpoints);
       fill(255*heartrate, 0, 255*(1-heartrate)); 
-      draw_heart(x, y, radius/100.0f, heartrate);
+      draw_heart(x, y, radius/RADIUS*2, heartrate);
     }
   }
 }

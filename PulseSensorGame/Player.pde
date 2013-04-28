@@ -17,6 +17,7 @@ class Player
   float x, y;
   boolean ai_controlled;
   int score;
+  Bubble target;
 
   Player(float _x)
   {

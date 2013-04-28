@@ -93,6 +93,10 @@ UPDATE
 float creation_timer = 0;
 void __update(float dt) 
 {
+  // reset destroyer target
+  destroyer.target = null;
+  
+  
   /// SET HEARTRATES BASED ON PULSENSOR OR KEYBOARD
   if(use_pulsesensor)
   {
@@ -107,7 +111,6 @@ void __update(float dt)
     else
       creator.decay_heartrate(dt);
       
-      
     // update destroyer heartrate
     if(destroyer.ai_controlled)
       destroyer.random_heartrate(dt);
@@ -115,6 +118,7 @@ void __update(float dt)
       destroyer.decay_heartrate(dt);
   }
   
+  // move players
   destroyer.y = (1-destroyer.heartrate)*(height - 2*Bubble.RADIUS) + Bubble.RADIUS;
   creator.y = (1-creator.heartrate)*(height - 2*Bubble.RADIUS) + Bubble.RADIUS;
   
@@ -136,6 +140,10 @@ void __update(float dt)
     else
       b.update(dt);
   }
+  
+  // destroy bubbles
+  if(destroyer.target != null)
+    destroyer.target.takeDamage();
 }
 
 
@@ -158,7 +166,10 @@ void __draw()
   fill(255*destroyer.heartrate, 0, 255*(1-destroyer.heartrate));
   float bar_y = destroyer.y, bar_h = Bubble.RADIUS*Bubble.DAMAGE_THRESHOLD;
   rectMode(CORNER);
-  rect(0, bar_y - 16, width, 16); 
+  if(destroyer.target == null)
+    rect(0, bar_y - 16, width, 16); 
+  else
+    rect(destroyer.target.x, bar_y - 16, width - destroyer.target.x, 16); 
   
   // draw bubbles
   for(Bubble b : bubbles)
