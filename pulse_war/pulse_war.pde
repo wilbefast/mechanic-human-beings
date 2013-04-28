@@ -22,7 +22,7 @@ ArrayList<Bubble> bubbles;
 INIT 
 --------------------------------------------------------------------------------
 */
-
+void setup() { game_setup(); }
 void game_setup() 
 {
   creator = new Player();

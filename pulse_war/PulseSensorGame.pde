@@ -38,6 +38,7 @@ boolean beat = false;    // set when a heart beat is detected, then cleared when
 boolean beat2 = false;    // set when a heart beat is detected, then cleared when the BPM graph is advanced
 int oldBPM;
 
+/*
 void setup() 
 {
   size(displayWidth, displayHeight);
@@ -71,7 +72,7 @@ void setup()
   port = new Serial(this, Serial.list()[6], 115200);  // make sure Arduino is talking serial at this baud rate
   port.clear();            // flush buffer
   port.bufferUntil('\n');  // set buffer full flag on receipt of carriage return
-}
+}*/
 
 
 /*void draw() 
@@ -118,8 +119,9 @@ void setup()
 }  //end of draw loop
 */
 
+/*
 void exit() 
 {
   port.stop();
-}
+}*/
 
