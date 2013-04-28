@@ -39,11 +39,36 @@ PLAYER CLASS
 
 class Player
 {
+  static final float PULSE_INCREASE_SPEED = 0.04f,
+              PULSE_DECREASE_SPEED = 0.1f,
+              PULSE_RANDOMVAR_SPEED = 1.0f,
+              PULSE_KEYBOARD_SPEED = 0.3f;
+  
+  
   float heartrate;
+  boolean ai_controlled;
   
   Player()
   {
+    ai_controlled = false;
     heartrate = 0.5;
+  }
+  
+  void decay_heartrate(float dt)
+  {
+    heartrate = clamp(heartrate -dt*PULSE_DECREASE_SPEED, 0, 1);
+  }
+  
+  void random_heartrate(float dt)
+  {
+    heartrate = clamp(heartrate + signedRand(dt*PULSE_RANDOMVAR_SPEED), 0, 1);
+  }
+  
+  void keyboard_heartrate(float dt, boolean keyIncrease, boolean keyDecrease)
+  {
+    int delta = 0;
+    if(keyIncrease) delta++; if(keyDecrease) delta--;
+    heartrate = clamp(heartrate + delta*dt*PULSE_KEYBOARD_SPEED, 0, 1);
   }
 }
 
@@ -203,8 +228,6 @@ UPDATE
 
 float creation_timer = 0;
 float CREATION_INTERVAL = 2;
-int bubblecount=0;
-int popcount=0;
 void __update(float dt) 
 {
   /// SET HEARTRATES BASED ON PULSENSOR OR KEYBOARD
@@ -215,13 +238,18 @@ void __update(float dt)
   }
   else
   {
-    // random creator heartrate
-    creator.heartrate = clamp(creator.heartrate + signedRand(dt), 0, 1);
-    
-    // controlled destroyer heartrate
-    int delta = 0;
-    if(keyUp) delta++; if(keyDown) delta--;
-    destroyer.heartrate = clamp(destroyer.heartrate + delta*dt*0.3f, 0, 1);
+    // update creator heartrate
+    if(creator.ai_controlled)
+      creator.random_heartrate(dt);
+    else
+      creator.decay_heartrate(dt);
+      
+      
+    // update destroyer heartrate
+    if(destroyer.ai_controlled)
+      destroyer.random_heartrate(dt);
+    else
+      destroyer.decay_heartrate(dt);
   }
   
   // create bubbles
@@ -230,7 +258,6 @@ void __update(float dt)
   {
     creation_timer = CREATION_INTERVAL;
     bubbles.add(new Bubble(creator.heartrate));
-    bubblecount++;
   }
   
   // update bubbles
@@ -239,14 +266,9 @@ void __update(float dt)
   {
     Bubble b = biter.next();
     if(b.purge)
-		{
       biter.remove();
-			popcount++;
-		}
     else
-    {
       b.update(dt);
-    }
   }
 }
 
@@ -267,6 +289,7 @@ void __draw()
   for(Bubble b : bubbles)
     b.draw();
     
+  color(0);
   fill(0,0,0); 
   
   if(use_pulsesensor)
@@ -323,6 +346,15 @@ void stop()
 
 void keyPressed()
 {
+  if(key == CODED)
+  {
+    if(keyCode == 20) // CAPS
+      creator.heartrate = clamp(creator.heartrate + Player.PULSE_INCREASE_SPEED, 0, 1);
+    
+    else if(keyCode == 16) // SHIFT
+      destroyer.heartrate = clamp(destroyer.heartrate + Player.PULSE_INCREASE_SPEED, 0, 1);
+  }
+  
   setKeyState(key, keyCode, true);
 }
 
