@@ -1,5 +1,13 @@
 /*
 --------------------------------------------------------------------------------
+IMPORTS
+--------------------------------------------------------------------------------
+*/
+
+import java.util.Iterator;
+
+/*
+--------------------------------------------------------------------------------
 USEFUL FUNCTIONS
 --------------------------------------------------------------------------------
 */
@@ -81,12 +89,16 @@ class Bubble
       wobble = 0.0f;
       
     // take damage
-    if(y > RADIUS)
+    if(y > 0)
     {
       hitpoints -= wobble * DAMAGE_SPEED;
       if(hitpoints <= 0)
         purge = true;
     }
+    
+    // disppear off map
+    if(y - RADIUS > height)
+      purge = true;
   }
   
   void draw()
@@ -162,8 +174,15 @@ void __update(float dt)
   }
   
   // update bubbles
-  for(Bubble b : bubbles)
-    b.update(dt);
+  Iterator<Bubble> biter = bubbles.iterator();
+  while(biter.hasNext())
+  {
+    Bubble b = biter.next();
+    if(b.purge)
+      biter.remove();
+    else
+      b.update(dt);
+  }
 }
 
 
