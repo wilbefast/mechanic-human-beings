@@ -121,9 +121,10 @@ void __update(float dt)
   
   // move players
   float target_y = (1-destroyer.heartrate)*(height - 128) + 64;
-    destroyer.y = linter(destroyer.y, target_y, 0.3f);
-  target_y = creator.y = (1-creator.heartrate)*(height - 128) + 64;
-    creator.y = linter(creator.y, target_y, 0.3f);
+    destroyer.y = linter(destroyer.y, target_y, 0.9f);
+    
+  target_y = (1-creator.heartrate)*(height - 128) + 64;
+    creator.y = linter(creator.y, target_y, 0.9f);
   
   // create bubbles
   creation_timer = creation_timer - dt;
@@ -211,7 +212,9 @@ void __draw()
   if(use_pulsesensor)
   {
     text(BPM + " BPM", 64, height - 16);
-    text(BPM2 + " BPM", width - 64, height - 16);
+    text("BPM", 64, height - 32);
+    text(BPM2 + " BPM", width - 64, height - 32);
+    text("BPM", width - 64, height - 16);
   }
   else
   { 
