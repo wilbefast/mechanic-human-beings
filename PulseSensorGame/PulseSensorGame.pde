@@ -30,6 +30,7 @@ void setup()
 {
   // screen resolution
   size(640, 480);
+  frame.setTitle("Heart Attack!");
   //size(displayWidth, displayHeight);  // Stage size
   frameRate(MAX_FPS);  
   
@@ -217,6 +218,9 @@ void __draw()
   }
   text(creator.score,  32, 32);
   text(destroyer.score, width - 32, 32);
+  
+  textAlign(CENTER);
+  text("Heart Attack!", width/2, 32);
 }
 
 
