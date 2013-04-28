@@ -76,8 +76,8 @@ void setup()
     }
   }
   
-  creator = new Player();
-  destroyer = new Player();
+  destroyer = new Player(width - 32);
+  creator = new Player(32);
   
   bubbles = new ArrayList<Bubble>();
 }
@@ -115,6 +115,9 @@ void __update(float dt)
       destroyer.decay_heartrate(dt);
   }
   
+  destroyer.y = (1-destroyer.heartrate)*(height - 2*Bubble.RADIUS) + Bubble.RADIUS;
+  creator.y = (1-creator.heartrate)*(height - 2*Bubble.RADIUS) + Bubble.RADIUS;
+  
   // create bubbles
   creation_timer = creation_timer - dt;
   if(creation_timer < 0)
@@ -150,26 +153,39 @@ void __draw()
   //background(255*destroyer.heartrate, 0, 255*(1-destroyer.heartrate)); 
   
   // draw destroyer bar
+  stroke(0);
   strokeWeight(5.0f);
   fill(255*destroyer.heartrate, 0, 255*(1-destroyer.heartrate));
-  float bar_y = (1-destroyer.heartrate)*height, bar_h = 2*Bubble.RADIUS*Bubble.DAMAGE_THRESHOLD;
+  float bar_y = destroyer.y, bar_h = 2*Bubble.RADIUS*Bubble.DAMAGE_THRESHOLD;
   rectMode(CORNER);
-  rect(0, bar_y - 16, width, 32); 
+  rect(80, bar_y - 16, width-160, 32); 
   
   // draw bubbles
   for(Bubble b : bubbles)
     b.draw();
+  
+  // draw GUI boxes
+  fill(255);
+  stroke(0);
+  strokeWeight(5.0f);
+  rect(0, 0, 64, height);
+  rect(width-64, 0, 64, height);
+  
+  // draw hearts
+  creator.draw_heart();
+  destroyer.draw_heart();
     
+  // draw GUI text
   fill(0, 0, 0); 
   if(use_pulsesensor)
   {
-    text("CREATOR: " + BPM + " BPM (" + (int)(creator.heartrate*100) + "%)", 128, height - 32);
-    text("DESTROYER: " + BPM2 + " BPM = (" + (int)(destroyer.heartrate*100) + "%)", width - 128, height - 32);
+    text(BPM + " BPM (" + (int)(creator.heartrate*100) + "%)", 64, height - 16);
+    text(BPM2 + " BPM = (" + (int)(destroyer.heartrate*100) + "%)", width - 64, height - 16);
   }
   else
   { 
-    text("CREATOR: " + (int)(creator.heartrate*100) + "%",  128, height - 32);
-    text("DESTROYER: "  + (int)(destroyer.heartrate*100) + "%", width - 128, height - 32);
+    text((int)(creator.heartrate*100) + "%",  32, height - 16);
+    text((int)(destroyer.heartrate*100) + "%", width - 32, height - 16);
   }
 }
 
