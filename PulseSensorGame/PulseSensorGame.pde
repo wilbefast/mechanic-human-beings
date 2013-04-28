@@ -23,11 +23,9 @@ INIT
 --------------------------------------------------------------------------------
 */
 
-int MAX_FPS = 120;
-boolean use_pulsesensor = true;
-
 void setup() 
 {
+<<<<<<< HEAD
   // screen resolution
   size(640, 480);
   //size(displayWidth, displayHeight);  // Stage size
@@ -35,10 +33,16 @@ void setup()
   
   
   font = loadFont("Arial-BoldMT-24.vlw");
+=======
+  size(700, 600);  // Stage size
+  frameRate(100);  
+  font = loadFont("CooperBlackStd-24.vlw");
+>>>>>>> right
   textFont(font);
   textAlign(CENTER);
   rectMode(CENTER);
   ellipseMode(CENTER);  
+  text("Pulse War!!!", width/2,height/2);
 // Scrollbar constructor inputs: x,y,width,height,minVal,maxVal
   scaleBar = new Scrollbar (400, 575, 180, 12, 0.5, 1.0);  // set parameters for the scale bar
   RawY = new int[PulseWindowWidth];          // initialize raw pulse waveform array
@@ -54,32 +58,21 @@ void setup()
     RawY[i] = height/2; // initialize the pulse window data line to V/2
  }
    
-  if(use_pulsesensor) 
-  {
-    try
-    {
-      // GO FIND THE ARDUINO
-      println(Serial.list());    // print a list of available serial ports
-      
-      // choose the number between the [] that is connected to the Arduino
-      port = new Serial(this, Serial.list()[6], 115200);  // make sure Arduino is talking serial at this baud rate
-      port.clear();            // flush buffer
-      port.bufferUntil('\n');  // set buffer full flag on receipt of carriage return
-      
-      use_pulsesensor = true;
-    }
-    catch(Exception e)
-    {
-      println("Arduin Pulsesensor startup failed (" + e + ").");
-      println("Defaulting to keyboard control.");
-      use_pulsesensor = false;
-    }
-  }
+// GO FIND THE ARDUINO
+  println(Serial.list());    // print a list of available serial ports
+  // choose the number between the [] that is connected to the Arduino
+  port = new Serial(this, Serial.list()[6], 115200);  // make sure Arduino is talking serial at this baud rate
+  port.clear();            // flush buffer
+  port.bufferUntil('\n');  // set buffer full flag on receipt of carriage return
+  
   
   destroyer = new Player(width - 32);
   creator = new Player(32);
   
   bubbles = new ArrayList<Bubble>();
+  
+  //size(displayWidth, displayHeight);
+  size(960, 640);
 }
 
 
@@ -93,6 +86,7 @@ UPDATE
 float creation_timer = 0;
 void __update(float dt) 
 {
+<<<<<<< HEAD
   /// SET HEARTRATES BASED ON PULSENSOR OR KEYBOARD
   if(use_pulsesensor)
   {
@@ -117,6 +111,10 @@ void __update(float dt)
   
   destroyer.y = (1-destroyer.heartrate)*(height - 2*Bubble.RADIUS) + Bubble.RADIUS;
   creator.y = (1-creator.heartrate)*(height - 2*Bubble.RADIUS) + Bubble.RADIUS;
+=======
+  creator.heartrate = clamp((BPM-50.0f)/100.0f,0,1);
+  destroyer.heartrate = clamp((BPM2-50.0f)/100.0f,0,1);
+>>>>>>> right
   
   // create bubbles
   creation_timer = creation_timer - dt;
@@ -163,6 +161,7 @@ void __draw()
   // draw bubbles
   for(Bubble b : bubbles)
     b.draw();
+<<<<<<< HEAD
   
   // draw GUI boxes
   fill(255);
@@ -189,6 +188,16 @@ void __draw()
   }
   text(creator.score,  32, 32);
   text(destroyer.score, width - 32, 32);
+=======
+    
+  color(0);
+  fill(0,0,0);  
+  text("Creator: " + BPM + " BPM, rate " + creator.heartrate ,200,600);
+  text("Destroyer: " + BPM2 + " BPM, rate " + destroyer.heartrate ,750,600);
+  
+  text("Score: " + bubblecount,200,620);
+  text("Score: " + popcount,750,620);
+>>>>>>> right
 }
 
 
@@ -199,7 +208,7 @@ MAIN LOOP
 --------------------------------------------------------------------------------
 */
 
-float DT = 1.0f/MAX_FPS;
+float DT = 1.0/60.0;
 void draw() 
 { 
   __update(DT);

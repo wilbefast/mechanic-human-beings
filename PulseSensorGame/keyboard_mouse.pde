@@ -4,6 +4,7 @@ INPUT HANDLING
 --------------------------------------------------------------------------------
 */
 
+<<<<<<< HEAD
 boolean keyUp = false, keyDown = false;
 
 void setKeyState(int _key, int _keyCode, boolean newState)
@@ -45,3 +46,5 @@ void keyReleased()
   setKeyState(key, keyCode, false);
 }
 
+=======
+>>>>>>> right
