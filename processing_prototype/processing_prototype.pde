@@ -43,16 +43,17 @@ BUBBLE CLASS
 
 class Bubble
 {
-  static final float RADIUS = 32.0f, SPEED = 16.0f, DAMAGE_THRESHOLD = 0.2f;
+  static final float RADIUS = 128.0f, SPEED = 32.0f, DAMAGE_THRESHOLD = 0.06f;
   
-  float x, y, wobble, heartrate;
+  float x, y, wobble, heartrate, hitpoints;
   boolean purge = false;
   
   Bubble(float heartrate)
   {
     this.x = random(1.0f)*(width - 2*RADIUS) + RADIUS;
-    this.y = -RADIUS;
+    this.y = -RADIUS/2;
     this.heartrate = heartrate;
+    this.hitpoints = 1.0f;
   }
   
   void update(float dt)
@@ -60,19 +61,29 @@ class Bubble
     // move
     y += dt*SPEED;
     
-    // destroy
+    // wobble
     float drate = abs(destroyer.heartrate - heartrate);
     if(drate < DAMAGE_THRESHOLD)
       wobble = 1 - drate/DAMAGE_THRESHOLD;
+    else
+      wobble = 0.0f;
+      
+    // take damage
+    if(y > RADIUS)
+    {
+      hitpoints -= wobble * 0.01f;
+      if(hitpoints <= 0)
+        purge = true;
+    }
   }
   
   void draw()
   {
     if(!purge)
     {
-      float wobble_radius = RADIUS * (1 + 0.3f*signedRand(wobble));
+      float wobble_radius = hitpoints * RADIUS * (1 + 0.3f*signedRand(wobble));
       
-      
+      strokeWeight(8);
       fill(255*heartrate, 0, 255*(1-heartrate)); 
       ellipseMode(CENTER);
       ellipse(x, y, wobble_radius, wobble_radius);
@@ -105,7 +116,8 @@ void setup()
   
   bubbles = new ArrayList<Bubble>();
   
-  size(640, 480);
+  //size(displayWidth, displayHeight);
+  size(960, 640);
 }
 
 
@@ -117,7 +129,7 @@ UPDATE
 */
 
 float creation_timer = 0;
-float CREATION_INTERVAL = 15;
+float CREATION_INTERVAL = 2;
 void __update(float dt) 
 {
   // random creator heartrate
