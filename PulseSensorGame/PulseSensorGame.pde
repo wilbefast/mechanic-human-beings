@@ -158,7 +158,7 @@ void __draw()
   fill(255*destroyer.heartrate, 0, 255*(1-destroyer.heartrate));
   float bar_y = destroyer.y, bar_h = 2*Bubble.RADIUS*Bubble.DAMAGE_THRESHOLD;
   rectMode(CORNER);
-  rect(80, bar_y - 16, width-160, 32); 
+  rect(0, bar_y - 16, width, 32); 
   
   // draw bubbles
   for(Bubble b : bubbles)
@@ -187,6 +187,8 @@ void __draw()
     text((int)(creator.heartrate*100) + "%",  32, height - 16);
     text((int)(destroyer.heartrate*100) + "%", width - 32, height - 16);
   }
+  text(creator.score,  32, 32);
+  text(destroyer.score, width - 32, 32);
 }
 
 

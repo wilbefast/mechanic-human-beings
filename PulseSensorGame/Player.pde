@@ -16,6 +16,7 @@ class Player
   float heartrate;
   float x, y;
   boolean ai_controlled;
+  int score;
 
   Player(float _x)
   {
@@ -23,6 +24,7 @@ class Player
     heartrate = 0.5;
     x = _x;
     y = 0.5;
+    score = 0;
   }
   
   void draw_heart()

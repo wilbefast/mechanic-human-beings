@@ -13,14 +13,14 @@ class Bubble
                     RADIUS_CHANGE_SPEED = 0.1f,
                     WOBBLE_AMOUNT = 0.5f,
                     LINE_WIDTH = 5.0f,
-                    CREATION_INTERVAL = 4.5f;
+                    CREATION_INTERVAL = 2.0f;
   
   float x, y, wobble, radius, heartrate, hitpoints;
   boolean purge = false;
   
   Bubble(float heartrate)
   {
-    this.x = -RADIUS/2;
+    this.x = 0;
     
     this.y = (1-heartrate)*(height - 2*RADIUS) + RADIUS;
     this.radius = RADIUS;
@@ -41,16 +41,22 @@ class Bubble
       wobble = 0.0f;
       
     // take damage
-    if(x > 0)
+    if(x > RADIUS)
     {
       hitpoints -= wobble * DAMAGE_SPEED;
       if(hitpoints <= 0)
+      {
         purge = true;
+        destroyer.score += 1;
+      }
     }
     
     // disppear off map
     if(x - RADIUS > width)
+    {
       purge = true;
+      creator.score += 5;
+    }
   }
   
   void draw()
