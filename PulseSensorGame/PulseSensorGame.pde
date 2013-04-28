@@ -202,8 +202,11 @@ UPDATE
 
 float creation_timer = 0;
 float CREATION_INTERVAL = 2;
+int bubblecount=0;
+int popcount=0;
 void __update(float dt) 
 {
+<<<<<<< HEAD
   /// SET HEARTRATES BASED ON PULSENSOR OR KEYBOARD
   if(use_pulsesensor)
   {
@@ -220,6 +223,10 @@ void __update(float dt)
     if(keyUp) delta++; if(keyDown) delta--;
     destroyer.heartrate = clamp(destroyer.heartrate + delta*dt*0.3f, 0, 1);
   }
+=======
+  creator.heartrate = clamp((BPM-50.0f)/100.0f,0,1);
+  destroyer.heartrate = clamp((BPM2-50.0f)/100.0f,0,1);
+>>>>>>> few changes
   
   // create bubbles
   creation_timer = creation_timer - dt;
@@ -227,6 +234,7 @@ void __update(float dt)
   {
     creation_timer = CREATION_INTERVAL;
     bubbles.add(new Bubble(creator.heartrate));
+    bubblecount++;
   }
   
   // update bubbles
@@ -234,10 +242,15 @@ void __update(float dt)
   while(biter.hasNext())
   {
     Bubble b = biter.next();
-    if(b.purge)
+    if(b.purge){
       biter.remove();
+      popcount++;
+      //bubblecount--;
+    }
     else
+    {
       b.update(dt);
+    }
   }
 }
 
@@ -260,8 +273,11 @@ void __draw()
     
   color(0);
   fill(0,0,0);  
-  text(BPM + " BPM, creator:" + creator.heartrate ,600,200);
-  text(BPM2 + " BPM2, destroyer:" + destroyer.heartrate ,600,300);
+  text("creator: " + BPM + " BPM, rate " + creator.heartrate ,150,50);
+  text("destroyer: " + BPM2 + " BPM, rate " + destroyer.heartrate ,800,50);
+  
+  text("score: " + bubblecount,150,70);
+  text("score: " + popcount,800,70);
 }
 
 
