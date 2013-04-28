@@ -4,6 +4,7 @@ INPUT HANDLING
 --------------------------------------------------------------------------------
 */
 
+<<<<<<< HEAD
 boolean keyUp = false, keyDown = false;
 
 void setKeyState(int _key, int _keyCode, boolean newState)
@@ -27,13 +28,17 @@ void keyPressed()
   if(key == CODED)
   {
     if(keyCode == 20) // CAPS
-      creator.heartrate = clamp(creator.heartrate + Player.PULSE_INCREASE_SPEED, 0, 1);
+      creator.boost_heartrate();
     
     else if(keyCode == 16) // SHIFT
-      destroyer.heartrate = clamp(destroyer.heartrate + Player.PULSE_INCREASE_SPEED, 0, 1);
+      destroyer.boost_heartrate();
   }
-  
-  setKeyState(key, keyCode, true);
+  else if(key == 'm')
+    destroyer.boost_heartrate();
+  else if(key == 'a')
+    creator.boost_heartrate();
+  else
+    setKeyState(key, keyCode, true);
 }
 
 void keyReleased()
@@ -41,3 +46,5 @@ void keyReleased()
   setKeyState(key, keyCode, false);
 }
 
+=======
+>>>>>>> right

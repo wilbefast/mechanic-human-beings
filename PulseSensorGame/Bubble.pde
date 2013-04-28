@@ -6,20 +6,21 @@ BUBBLE CLASS
 
 class Bubble
 {
-  static final float RADIUS = 96.0f, 
-                    SPEED = 38.0f, 
-                    DAMAGE_THRESHOLD = 0.12f, 
+  static final float RADIUS = 64.0f, 
+                    SPEED = 16.0f, 
+                    DAMAGE_THRESHOLD = 0.2f, 
                     DAMAGE_SPEED = 0.05f,
                     RADIUS_CHANGE_SPEED = 0.1f,
                     WOBBLE_AMOUNT = 0.5f,
-                    LINE_WIDTH = 8.0f;
+                    LINE_WIDTH = 5.0f,
+                    CREATION_INTERVAL = 2.0f;
   
   float x, y, wobble, radius, heartrate, hitpoints;
   boolean purge = false;
   
   Bubble(float heartrate)
   {
-    this.x = -RADIUS/2;
+    this.x = 0;
     
     this.y = (1-heartrate)*(height - 2*RADIUS) + RADIUS;
     this.radius = RADIUS;
@@ -40,16 +41,22 @@ class Bubble
       wobble = 0.0f;
       
     // take damage
-    if(x > 0)
+    if(x > RADIUS)
     {
       hitpoints -= wobble * DAMAGE_SPEED;
       if(hitpoints <= 0)
+      {
         purge = true;
+        destroyer.score += 1;
+      }
     }
     
     // disppear off map
     if(x - RADIUS > width)
+    {
       purge = true;
+      creator.score += 5;
+    }
   }
   
   void draw()
@@ -61,8 +68,7 @@ class Bubble
       
       strokeWeight(LINE_WIDTH * hitpoints);
       fill(255*heartrate, 0, 255*(1-heartrate)); 
-      ellipseMode(CENTER);
-      ellipse(x, y, radius, radius);
+      draw_heart(x, y, radius/100.0f, heartrate);
     }
   }
 }
