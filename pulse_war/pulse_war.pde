@@ -31,7 +31,7 @@ void game_setup()
   bubbles = new ArrayList<Bubble>();
   
   //size(displayWidth, displayHeight);
-  //size(960, 640);
+  size(960, 640);
 }
 
 
