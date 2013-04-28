@@ -52,7 +52,7 @@ class Bubble
     if(x - RADIUS > width)
     {
       purge = true;
-      creator.score += 5;
+      creator.score += 10;
     }
   }
   

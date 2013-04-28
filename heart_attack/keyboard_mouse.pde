@@ -17,11 +17,6 @@ void setKeyState(int _key, int _keyCode, boolean newState)
   }
 }
 
-void stop()
-{
-  port.stop();
-}
-
 void keyPressed()
 {
   if(key == CODED)

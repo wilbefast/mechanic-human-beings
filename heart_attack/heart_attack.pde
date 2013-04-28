@@ -24,7 +24,7 @@ INIT
 */
 
 int MAX_FPS = 120;
-boolean use_pulsesensor = true;
+PFont font;
 
 void setup() 
 {
@@ -34,52 +34,14 @@ void setup()
   //size(displayWidth, displayHeight);  // Stage size
   frameRate(MAX_FPS);  
   
-  
   font = loadFont("Arial-BoldMT-24.vlw");
   textFont(font);
   textAlign(CENTER);
   rectMode(CENTER);
   ellipseMode(CENTER);  
-// Scrollbar constructor inputs: x,y,width,height,minVal,maxVal
-  scaleBar = new Scrollbar (400, 575, 180, 12, 0.5, 1.0);  // set parameters for the scale bar
-  RawY = new int[PulseWindowWidth];          // initialize raw pulse waveform array
-  ScaledY = new int[PulseWindowWidth];       // initialize scaled pulse waveform array
-  rate = new int [BPMWindowWidth];           // initialize BPM waveform array
-  zoom = 0.75;                               // initialize scale of heartbeat window
-    
-// set the visualizer lines to 0
- for (int i=0; i<rate.length; i++){
-    rate[i] = 555;      // Place BPM graph line at bottom of BPM Window 
-   }
- for (int i=0; i<RawY.length; i++){
-    RawY[i] = height/2; // initialize the pulse window data line to V/2
- }
    
-  if(use_pulsesensor) 
-  {
-    try
-    {
-      // GO FIND THE ARDUINO
-      println(Serial.list());    // print a list of available serial ports
-      
-      // choose the number between the [] that is connected to the Arduino
-      port = new Serial(this, Serial.list()[6], 115200);  // make sure Arduino is talking serial at this baud rate
-      port.clear();            // flush buffer
-      port.bufferUntil('\n');  // set buffer full flag on receipt of carriage return
-      
-      use_pulsesensor = true;
-    }
-    catch(Exception e)
-    {
-      println("Arduin Pulsesensor startup failed (" + e + ").");
-      println("Defaulting to keyboard control.");
-      use_pulsesensor = false;
-    }
-  }
-  
   destroyer = new Player(width - 32);
   creator = new Player(32);
-  
   bubbles = new ArrayList<Bubble>();
 }
 
@@ -91,21 +53,14 @@ UPDATE
 --------------------------------------------------------------------------------
 */
 
-float creation_timer = 0;
+float creation_timer = Bubble.CREATION_INTERVAL * 3;
 void __update(float dt) 
 {
   // reset destroyer target
   destroyer.target = null;
   
   
-  /// SET HEARTRATES BASED ON PULSENSOR OR KEYBOARD
-  if(use_pulsesensor)
-  {
-    creator.heartrate = clamp((BPM-50.0f)/100.0f,0,1);
-    destroyer.heartrate = clamp((BPM2-50.0f)/100.0f,0,1);
-  }
-  else
-  {
+  /// SET HEARTRATES BASED ON KEYBOARD
     // update creator heartrate
     if(creator.ai_controlled)
       creator.random_heartrate(dt);
@@ -117,7 +72,6 @@ void __update(float dt)
       destroyer.random_heartrate(dt);
     else
       destroyer.decay_heartrate(dt);
-  }
   
   // move players
   float target_y = (1-destroyer.heartrate)*(height - 128) + 64;
@@ -209,18 +163,8 @@ void __draw()
     
   // draw GUI text
   fill(0, 0, 0); 
-  if(use_pulsesensor)
-  {
-    text(BPM + " BPM", 64, height - 16);
-    text("BPM", 64, height - 32);
-    text(BPM2 + " BPM", width - 64, height - 32);
-    text("BPM", width - 64, height - 16);
-  }
-  else
-  { 
     text((int)(creator.heartrate*100) + "%",  32, height - 16);
     text((int)(destroyer.heartrate*100) + "%", width - 32, height - 16);
-  }
   text(creator.score,  32, 32);
   text(destroyer.score, width - 32, 32);
   
