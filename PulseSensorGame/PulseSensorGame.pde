@@ -140,7 +140,8 @@ boolean use_pulsesensor = true;
 void setup() 
 {
   // screen resolution
-  size(displayWidth, displayHeight);  // Stage size
+  size(640, 480);
+  //size(displayWidth, displayHeight);  // Stage size
   frameRate(MAX_FPS);  
   
   
@@ -259,9 +260,18 @@ void __draw()
     b.draw();
     
   color(0);
-  fill(0,0,0);  
-  text(BPM + " BPM, creator:" + creator.heartrate ,600,200);
-  text(BPM2 + " BPM2, destroyer:" + destroyer.heartrate ,600,300);
+  fill(0,0,0); 
+  
+  if(use_pulsesensor)
+  {
+    text("CREATOR: " + BPM + " BPM (" + (int)(creator.heartrate*100) + "%)", 128, height - 32);
+    text("DESTROYER: " + BPM2 + " BPM = (" + (int)(destroyer.heartrate*100) + "%)", width - 128, height - 32);
+  }
+  else
+  { 
+    text("CREATOR: " + (int)(creator.heartrate*100) + "%",  128, height - 32);
+    text("DESTROYER: "  + (int)(destroyer.heartrate*100) + "%", width - 128, height - 32);
+  }
 }
 
 
