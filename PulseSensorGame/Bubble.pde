@@ -6,9 +6,9 @@ BUBBLE CLASS
 
 class Bubble
 {
-  static final float RADIUS = 128.0f, 
-                    SPEED = 32.0f, 
-                    DAMAGE_THRESHOLD = 0.06f, 
+  static final float RADIUS = 96.0f, 
+                    SPEED = 38.0f, 
+                    DAMAGE_THRESHOLD = 0.12f, 
                     DAMAGE_SPEED = 0.05f,
                     RADIUS_CHANGE_SPEED = 0.1f,
                     WOBBLE_AMOUNT = 0.5f,
@@ -19,8 +19,9 @@ class Bubble
   
   Bubble(float heartrate)
   {
-    this.x = random(1.0f)*(width - 2*RADIUS) + RADIUS;
-    this.y = -RADIUS/2;
+    this.x = -RADIUS/2;
+    
+    this.y = (1-heartrate)*(height - 2*RADIUS) + RADIUS;
     this.radius = RADIUS;
     this.heartrate = heartrate;
     this.hitpoints = 1.0f;
@@ -29,7 +30,7 @@ class Bubble
   void update(float dt)
   {
     // move
-    y += dt*SPEED;
+    x += dt*SPEED;
     
     // wobble
     float drate = abs(destroyer.heartrate - heartrate);
@@ -39,7 +40,7 @@ class Bubble
       wobble = 0.0f;
       
     // take damage
-    if(y > 0)
+    if(x > 0)
     {
       hitpoints -= wobble * DAMAGE_SPEED;
       if(hitpoints <= 0)
@@ -47,7 +48,7 @@ class Bubble
     }
     
     // disppear off map
-    if(y - RADIUS > height)
+    if(x - RADIUS > width)
       purge = true;
   }
   
