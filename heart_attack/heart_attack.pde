@@ -25,6 +25,7 @@ INIT
 
 int MAX_FPS = 120;
 PFont font;
+boolean gameover = false;
 
 void setup() 
 {
@@ -38,8 +39,14 @@ void setup()
   textFont(font);
   textAlign(CENTER);
   rectMode(CENTER);
-  ellipseMode(CENTER);  
-   
+  ellipseMode(CENTER);
+
+  reset();  
+}
+
+void reset()
+{
+  gameover = false;
   destroyer = new Player(width - 32);
   creator = new Player(32);
   bubbles = new ArrayList<Bubble>();
@@ -53,9 +60,20 @@ UPDATE
 --------------------------------------------------------------------------------
 */
 
+int MAX_SCORE = 20;
+
 float creation_timer = Bubble.CREATION_INTERVAL * 3;
 void __update(float dt) 
 {
+  // win conditions
+  if(creator.score >= MAX_SCORE || destroyer.score >= MAX_SCORE)
+    gameover = true;
+  
+  // pause if game is over
+  if(gameover)
+    return;
+  
+  
   // reset destroyer target
   destroyer.target = null;
   
@@ -118,36 +136,39 @@ void __draw()
   background(255);
   //background(255*destroyer.heartrate, 0, 255*(1-destroyer.heartrate)); 
   
-  // draw destroyer bar
-  stroke(255*destroyer.heartrate*2, 128, 255*(1-destroyer.heartrate));
-  strokeWeight(5.0f);
-  fill(255*destroyer.heartrate, 0, 255*(1-destroyer.heartrate));
-  float bar_y = destroyer.y, bar_h = Bubble.RADIUS*Bubble.DAMAGE_THRESHOLD;
-  rectMode(CORNER);
-  
-  // explosion
-  float r = 24+signedRand(4);
-  if(destroyer.target == null)
-    rect(0, bar_y - 16, width, 16);
-  else
+  if(!gameover)
   {
-    rect(destroyer.target.x, bar_y - 16, width - destroyer.target.x, 16); 
-    // draw explosions
-    ellipseMode(RADIUS);
-    fill(255*destroyer.heartrate, 0, 255*(1-destroyer.heartrate));
-    ellipse(destroyer.target.x+signedRand(4), bar_y+signedRand(4), r, r); 
-  }
-    
-  // draw bubbles
-  for(Bubble b : bubbles)
-    b.draw();
-    
-  if(destroyer.target != null)
-  {
+    // draw destroyer bar
     stroke(255*destroyer.heartrate*2, 128, 255*(1-destroyer.heartrate));
     strokeWeight(5.0f);
-    fill(255*destroyer.heartrate, 0, 255*(1-destroyer.heartrate), 128);
-    ellipse(destroyer.target.x+signedRand(4), bar_y+signedRand(4), r, r); 
+    fill(255*destroyer.heartrate, 0, 255*(1-destroyer.heartrate));
+    float bar_y = destroyer.y, bar_h = Bubble.RADIUS*Bubble.DAMAGE_THRESHOLD;
+    rectMode(CORNER);
+    
+    // explosion
+    float r = 24+signedRand(4);
+    if(destroyer.target == null)
+      rect(0, bar_y - 16, width, 16);
+    else
+    {
+      rect(destroyer.target.x, bar_y - 16, width - destroyer.target.x, 16); 
+      // draw explosions
+      ellipseMode(RADIUS);
+      fill(255*destroyer.heartrate, 0, 255*(1-destroyer.heartrate));
+      ellipse(destroyer.target.x+signedRand(4), bar_y+signedRand(4), r, r); 
+    }
+      
+    // draw bubbles
+    for(Bubble b : bubbles)
+      b.draw();
+      
+    if(destroyer.target != null)
+    {
+      stroke(255*destroyer.heartrate*2, 128, 255*(1-destroyer.heartrate));
+      strokeWeight(5.0f);
+      fill(255*destroyer.heartrate, 0, 255*(1-destroyer.heartrate), 128);
+      ellipse(destroyer.target.x+signedRand(4), bar_y+signedRand(4), r, r); 
+    }
   }
   
   // draw GUI boxes
@@ -170,6 +191,18 @@ void __draw()
   text("A",  32, 24);
   fill(keyM ? 255 : 0, 0, keyM ? 0 : 255);
   text("M", width - 32, 24);
+  
+  // game over
+  fill(255, 0, 0);
+  if(gameover)
+  {
+    if(creator.score > destroyer.score)
+      text("A wins!", width/2, height/2);
+    else if(destroyer.score > creator.score)
+      text("M wins!", width/2, height/2);
+    else
+      text("Draw!", width/2, height/2);
+  }
 }
 
 

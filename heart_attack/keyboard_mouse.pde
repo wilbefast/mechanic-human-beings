@@ -24,6 +24,10 @@ void setKeyState(int _key, int _keyCode, boolean newState)
 
 void keyPressed()
 {
+  if(gameover)
+    reset();
+  
+  
   if(key == 'm')
     destroyer.boost_heartrate();
   else if(key == 'a')
