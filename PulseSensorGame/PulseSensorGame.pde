@@ -120,8 +120,10 @@ void __update(float dt)
   }
   
   // move players
-  destroyer.y = (1-destroyer.heartrate)*(height - 128) + 64;
-  creator.y = (1-creator.heartrate)*(height - 128) + 64;
+  float target_y = (1-destroyer.heartrate)*(height - 128) + 64;
+    destroyer.y = linter(destroyer.y, target_y, 0.3f);
+  target_y = creator.y = (1-creator.heartrate)*(height - 128) + 64;
+    creator.y = linter(creator.y, target_y, 0.3f);
   
   // create bubbles
   creation_timer = creation_timer - dt;
