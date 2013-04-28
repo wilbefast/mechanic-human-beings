@@ -68,8 +68,7 @@ class Bubble
       
       strokeWeight(LINE_WIDTH * hitpoints);
       fill(255*heartrate, 0, 255*(1-heartrate)); 
-      ellipseMode(CENTER);
-      ellipse(x, y, radius, radius);
+      draw_heart(x, y, radius/100.0f, heartrate);
     }
   }
 }

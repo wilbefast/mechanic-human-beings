@@ -32,10 +32,6 @@ class Player
      fill(255*destroyer.heartrate, 0, 255*(1-destroyer.heartrate));
      stroke(0);
      strokeWeight(3);
-     
-     // the 'heart' variable is set in serialEvent when arduino sees a beat happen
-     heart--;                    // heart is used to time how long the heart graphic swells when your heart beats
-     heart = max(heart,0);       // don't let the heart variable go into negative numbers
         
      smooth();   // draw the heart with two bezier curves
      bezier(x, y, 
