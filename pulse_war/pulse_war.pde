@@ -23,7 +23,7 @@ INIT
 --------------------------------------------------------------------------------
 */
 
-void setup() 
+void game_setup() 
 {
   creator = new Player();
   destroyer = new Player();
@@ -31,7 +31,7 @@ void setup()
   bubbles = new ArrayList<Bubble>();
   
   //size(displayWidth, displayHeight);
-  size(960, 640);
+  //size(960, 640);
 }
 
 
@@ -44,7 +44,7 @@ UPDATE
 
 float creation_timer = 0;
 float CREATION_INTERVAL = 2;
-void __update(float dt) 
+void game_update(float dt) 
 {
   // random creator heartrate
   creator.heartrate = clamp(destroyer.heartrate + signedRand(dt), 0, 1);
@@ -63,12 +63,12 @@ void __update(float dt)
   }
   
   // update bubbles
-  Iterator<Bubble> biter = bubbles.iterator();
-  while(biter.hasNext())
+  Iterator<Bubble> i = bubbles.iterator();
+  while(i.hasNext())
   {
-    Bubble b = biter.next();
+    Bubble b = i.next();
     if(b.purge)
-      biter.remove();
+      i.remove();
     else
       b.update(dt);
   }
@@ -82,7 +82,7 @@ GRAPHICS
 --------------------------------------------------------------------------------
 */
 
-void __draw() 
+void game_draw() 
 {
   // draw the background based on destroy heartrate
   background(255*destroyer.heartrate, 0, 255*(1-destroyer.heartrate)); 
@@ -103,8 +103,8 @@ MAIN LOOP
 float DT = 1.0/60.0;
 void draw() 
 {
-  __update(DT);
-  __draw();
+  game_update(DT);
+  game_draw();
 }
 
 
